@@ -150,11 +150,12 @@ func (r *router) matchAndDispatch(messages <-chan *packets.PublishPacket, order 
 				handlers := []MessageHandler{}
 				for e := r.routes.Front(); e != nil; e = e.Next() {
 					if e.Value.(*route).match(message.TopicName) {
+						routeHandler := e.Value.(*route)
 						if order {
-							handlers = append(handlers, e.Value.(*route).callback)
+							handlers = append(handlers, routeHandler.callback)
 						} else {
 							go func() {
-								e.Value.(*route).callback(client, m)
+								routeHandler.callback(client, m)
 								m.Ack()
 							}()
 						}
